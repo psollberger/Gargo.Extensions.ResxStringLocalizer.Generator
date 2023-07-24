@@ -1,0 +1,9 @@
+﻿<Project>
+  <ItemGroup>
+    <CompilerVisibleItemMetadata Include="EmbeddedResource" MetadataName="GenerateExtensionMethods" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <AdditionalFileItemNames>$(AdditionalFileItemNames);EmbeddedResource</AdditionalFileItemNames>
+  </PropertyGroup>
+</Project>

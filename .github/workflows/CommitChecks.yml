@@ -1,0 +1,45 @@
+name: Commit Checks
+
+on:
+  push:
+    branches:
+      - '**'
+    tags-ignore:
+      - v*
+
+  pull_request:
+    branches:
+      - main
+    tags-ignore:
+      - v*
+
+  workflow_dispatch:
+
+env:
+  ContinuousIntegrationBuild: true
+
+jobs:
+  do_the_things:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: NuGet Package Cache
+        uses: actions/cache@v3
+        id: nuget-package-cache
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: ${{ runner.os }}-nuget-
+
+      - name: dotnet restore
+        if: steps.nuget-package-cache.outputs.cache-hit != 'true'
+        run: dotnet restore
+
+      - name: dotnet build
+        run: dotnet build --configuration Release src/Generator
+
+#      - name: dotnet test
+#        run: dotnet test --no-build --configuration Release tests/Generator.Tests.Unit

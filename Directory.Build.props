@@ -1,0 +1,46 @@
+<Project>
+  <PropertyGroup Label="Build Default">
+    <MySolutionDir>$([System.IO.Path]::GetFullPath($(MSBuildThisFileDirectory)))</MySolutionDir>
+    <MyBuildDir>$(MySolutionDir)\bld</MyBuildDir>
+
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+
+    <Platform Condition="'$(Platform)'==''">AnyCPU</Platform>
+    <Configuration Condition="'$(Configuration)'==''">Debug</Configuration>
+    <Deterministic>true</Deterministic>
+
+    <SolutionDir Condition="'$(SolutionDir)'=='' Or $(SolutionDir) == '*Undefined*'">$(MySolutionDir)</SolutionDir>
+    <MSBuildProjectExtensionsPath>$(MyBuildDir)\msbuild\$(MSBuildProjectName)\</MSBuildProjectExtensionsPath>
+    <BaseOutputPath>$(MyBuildDir)\bin\</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(MyBuildDir)\obj\</BaseIntermediateOutputPath>
+
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <EnableWindowsTargeting>false</EnableWindowsTargeting>
+  </PropertyGroup>
+
+  <PropertyGroup Label="AssemblyInfo">
+    <!-- See: https://docs.microsoft.com/en-us/dotnet/core/project-sdk/msbuild-props#generateassemblyinfo -->
+    <Authors>Patrick Sollberger</Authors>
+    <Copyright>Copyright (c) 2023 Patrick Sollberger</Copyright>
+
+    <IncludeSourceRevisionInInformationalVersion>true</IncludeSourceRevisionInInformationalVersion>
+    <NeutralLanguage>en</NeutralLanguage>
+
+    <VersionPrefix Condition="'$(VersionPrefix)' == ''">1.0.1</VersionPrefix>
+    <VersionSuffix Condition="'$(Configuration)' == 'Debug'">dev</VersionSuffix>
+    <VersionSuffix Condition="'$(VersionSuffix)' == '' And '$(VcsBranch)' != '' And '$(VcsBranch)' != 'main'">$(VcsBranch)</VersionSuffix>
+    <FileVersion>$(VersionPrefix)</FileVersion>
+
+    <RepositoryUrl>https://github.com/psollberger/Gargo.Extensions.ResxStringLocalizer.Generator</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+
+    <PackageId>Gargo.Extensions.ResxStringLocalizer.Generator</PackageId>
+    <PackageProjectUrl>https://github.com/psollberger/Gargo.Extensions.ResxStringLocalizer.Generator</PackageProjectUrl>
+
+    <SourceRevisionId Condition="'$(VcsRevisionId)' != ''">$(VcsRevisionId)</SourceRevisionId>
+
+    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+    <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
+    <RestoreLockedMode Condition="'$(ContinuousIntegrationBuild)' == 'true'">true</RestoreLockedMode>
+  </PropertyGroup>
+</Project>

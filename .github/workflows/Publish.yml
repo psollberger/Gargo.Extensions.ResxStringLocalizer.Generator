@@ -1,0 +1,51 @@
+name: Publish
+
+on:
+  push:
+    tags:
+      - v*
+
+  workflow_dispatch:
+
+env:
+  ContinuousIntegrationBuild: true
+  PACKAGE_OUTPUT_DIRECTORY: ${{ github.workspace }}/dist
+  NUGET_SOURCE_URL: https://api.nuget.org/v3/index.json
+
+jobs:
+  do_the_things:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: NuGet Package Cache
+        uses: actions/cache@v3
+        id: nuget-package-cache
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
+          restore-keys: ${{ runner.os }}-nuget-
+
+      - name: dotnet restore
+        if: steps.nuget-package-cache.outputs.cache-hit != 'true'
+        run: dotnet restore
+
+      - name: dotnet build
+        run: dotnet build --configuration Release src/Generator
+
+      - name: Get Version Information
+        uses: battila7/get-version-action@v2
+        id: version
+
+      - name: dotnet pack
+        run: dotnet pack src/Generator
+               --no-restore --no-build --configuration Release
+               --include-symbols
+               -p:PackageVersion=${{ steps.version.outputs.version-without-v }}
+               -p:RepositoryCommit=${{ github.sha }}
+               --output ${{ env.PACKAGE_OUTPUT_DIRECTORY }}
+
+      - name: dotnet nuget push
+        run: dotnet nuget push ${{ env.PACKAGE_OUTPUT_DIRECTORY }}/*.nupkg -k ${{ secrets.NUGET_KEY }} -s ${{ env.NUGET_SOURCE_URL }}
